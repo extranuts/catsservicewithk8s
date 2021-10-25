@@ -1,12 +1,26 @@
 version: '3'
 services:
-  db-cats-api:
+  postgres:
     image: postgres:12
+    restart: always
     ports:
       - 5444:5432
-    restart: always
     environment:
       POSTGRES_PASSWORD: admin
       POSTGRES_USER: admin
       POSTGRES_DB: cats-api
-
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/cats-api
+    depends_on:
+      - db-cats-api
+    ports:
+      - 8080:8080
+volumes:
+  db-data:
